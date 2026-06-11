@@ -148,7 +148,7 @@ void main() {
   float diffuseRate = 0.5 * barVar(bar.seedA);
   float diffuseOffset = 0.08 * (bar.seedB - 0.5);
 
-  float liveColumn = uPointerActive * exp(-columnDist / 0.055);
+  float liveColumn = uPointerActive * exp(-columnDist / 0.038);
   float liveColumnWeight = uHasBackground ? 0.4 : 0.53;
   float activation = max(trailSample, liveColumn * liveColumnWeight);
 
@@ -156,7 +156,7 @@ void main() {
   barReveal = pow(barReveal, barVar(bar.seedA));
 
   float pulseScale = barPulseScale(bar);
-  float emitRadius = 0.26 * barVar(bar.seedB) * pulseScale;
+  float emitRadius = 0.22 * barVar(bar.seedB) * pulseScale;
 
   float yDist = abs(uv.y - mouseUv.y);
   float liveEmit = uPointerActive * exp(-yDist * yDist / (emitRadius * emitRadius));

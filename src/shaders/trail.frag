@@ -37,12 +37,12 @@ void main() {
 
   float barSeed = hash(vec2(barId, 3.0));
   float spread = 1.2 + min(uMouseVel, 2.5) * 0.4;
-  float columnStamp = uPointerActive * exp(-barDist / (spread * 1.6));
+  float columnStamp = uPointerActive * exp(-barDist / (spread * 1.1));
   columnStamp *= barVar(barSeed);
 
   float pulseScale = barPulseScale(barId, barSeed);
   float yDist = abs(vUv.y - uMouse.y);
-  float yRadius = 0.26 * barVar(barSeed) * pulseScale;
+  float yRadius = 0.22 * barVar(barSeed) * pulseScale;
   float vertStamp = exp(-yDist * yDist / (yRadius * yRadius));
 
   float stamp = columnStamp * vertStamp * uStampStrength;
