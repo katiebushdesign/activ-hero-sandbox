@@ -1,0 +1,18 @@
+{
+  "name": "activ-hero-sandbox",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "fetch-hero": "node scripts/fetch-figma-hero.mjs"
+  },
+  "dependencies": {
+    "three": "^0.175.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}
