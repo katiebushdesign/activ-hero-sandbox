@@ -177,3 +177,26 @@ button {
     display: none;
   }
 }
+
+.plasma-only {
+  background: #e5e5e7;
+  color: #1a1a1a;
+}
+
+.plasma-only .hero__subheadline {
+  color: rgba(26, 26, 26, 0.72);
+}
+
+.plasma-only .hero__cta--header {
+  border-color: rgba(26, 26, 26, 0.28);
+}
+
+.plasma-only .hero__cta--header:hover {
+  background: rgba(26, 26, 26, 0.06);
+}
+
+.plasma-only .hero__logo-mark {
+  background:
+    linear-gradient(#e5e5e7, #e5e5e7) padding-box,
+    linear-gradient(180deg, #fcffa4, #f15a24, #8e2464, #410066) border-box;
+}

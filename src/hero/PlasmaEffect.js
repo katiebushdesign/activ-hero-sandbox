@@ -84,7 +84,7 @@ export class PlasmaEffect {
   _ensureFallbackTexture() {
     if (this._fallbackTexture) return this._fallbackTexture;
 
-    const data = new Uint8Array([5, 5, 10, 255]);
+    const data = new Uint8Array([229, 229, 231, 255]);
     this._fallbackTexture = new THREE.DataTexture(data, 1, 1);
     this._fallbackTexture.colorSpace = THREE.SRGBColorSpace;
     this._fallbackTexture.needsUpdate = true;
@@ -96,12 +96,14 @@ export class PlasmaEffect {
     this.uniforms.uUseVideo.value = false;
     this.uniforms.uHasBackground.value = false;
     this.uniforms.uBackgroundCover.value.set(1, 1, 0, 0);
+    this.trailUniforms.uStampStrength.value = TUNING.STAMP_STRENGTH * 1.26;
   }
 
   setBackground(texture, { isVideo = false } = {}) {
     this.uniforms.uBackground.value = texture;
     this.uniforms.uUseVideo.value = isVideo;
     this.uniforms.uHasBackground.value = true;
+    this.trailUniforms.uStampStrength.value = TUNING.STAMP_STRENGTH;
     if (texture) {
       texture.colorSpace = THREE.SRGBColorSpace;
       this.refreshBackgroundCover(texture);

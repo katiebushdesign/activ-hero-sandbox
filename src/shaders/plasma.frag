@@ -33,6 +33,7 @@ const vec3 PALETTE[PALETTE_SIZE] = vec3[](
 );
 
 const float BAND_COUNT = 24.0;
+const vec3 PLASMA_IDLE_BG = vec3(0.898039, 0.898039, 0.905882); // warm grey #E5E5E7
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -67,7 +68,7 @@ GlassBar glassBarAt(vec2 uv) {
 
 vec3 sampleBackground(vec2 uv) {
   if (!uHasBackground) {
-    return vec3(0.0);
+    return PLASMA_IDLE_BG;
   }
 
   vec2 bgUv = clamp(coverUv(uv, uBackgroundCover), 0.0, 1.0);
@@ -81,11 +82,13 @@ vec3 sampleBackground(vec2 uv) {
 }
 
 float filmGrain(vec2 uv) {
-  vec2 cell = floor(uv * uResolution * 0.45);
+  float scale = uHasBackground ? 0.45 : 0.62;
+  vec2 cell = floor(uv * uResolution * scale);
   float t = uTime * 0.06;
   float g1 = hash(cell + t);
   float g2 = hash(cell * 1.37 + t * 0.73);
-  return (g1 + g2) * 0.5 - 0.5;
+  float g3 = hash(cell * 2.11 + t * 0.41);
+  return (g1 + g2 + g3) / 3.0 - 0.5;
 }
 
 float barVar(float seed) {
@@ -99,16 +102,33 @@ float barPulseScale(GlassBar bar) {
   return 1.0 + 0.01 + 0.01 * pulse;
 }
 
+vec3 saturateColor(vec3 color, float amount) {
+  float luma = dot(color, vec3(0.299, 0.587, 0.114));
+  return mix(vec3(luma), color, amount);
+}
+
 vec3 figmaGradient(vec2 uv, GlassBar bar, float emit) {
   float barYOffset = (bar.seedA - 0.5) * 0.08;
 
   float paletteT = (1.0 - uv.y) + barYOffset;
 
+  if (!uHasBackground) {
+    paletteT = paletteT * 0.83 + 0.095;
+  }
+
   float grain = hash(floor(uv * uResolution * 0.3));
-  paletteT += (grain - 0.5) * 0.016 * emit;
+  float fineGrain = hash(floor(uv * uResolution * 0.9) + 0.37);
+  float grainStrength = uHasBackground ? 0.022 : 0.048;
+  paletteT += ((grain - 0.5) * grainStrength + (fineGrain - 0.5) * grainStrength * 0.55) * emit;
 
   paletteT = clamp(paletteT, 0.0, 1.0);
-  return samplePalette(paletteT);
+  vec3 grad = samplePalette(paletteT);
+
+  if (!uHasBackground) {
+    grad = saturateColor(grad, 1.2);
+  }
+
+  return grad;
 }
 
 void main() {
@@ -129,7 +149,8 @@ void main() {
   float diffuseOffset = 0.08 * (bar.seedB - 0.5);
 
   float liveColumn = uPointerActive * exp(-columnDist / 0.055);
-  float activation = max(trailSample, liveColumn * 0.4);
+  float liveColumnWeight = uHasBackground ? 0.4 : 0.53;
+  float activation = max(trailSample, liveColumn * liveColumnWeight);
 
   float barReveal = smoothstep(diffuseOffset, diffuseOffset + diffuseRate, activation);
   barReveal = pow(barReveal, barVar(bar.seedA));
@@ -146,7 +167,7 @@ void main() {
   float colorAlpha = verticalMask * barReveal * emit;
 
   if (!uHasBackground && colorAlpha < 0.001) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4(PLASMA_IDLE_BG, 1.0);
     return;
   }
 
@@ -159,15 +180,21 @@ void main() {
   }
 
   float grain = filmGrain(uv);
+
   if (uHasBackground) {
-    color += grain * 0.06;
+    color += grain * 0.075;
   }
 
   if (colorAlpha > 0.001) {
-    vec3 screened = 1.0 - (1.0 - color) * (1.0 - gradColor);
-    color = mix(color, screened, colorAlpha * 0.92);
     if (uHasBackground) {
-      color += grain * 0.05 * colorAlpha;
+      vec3 screened = 1.0 - (1.0 - color) * (1.0 - gradColor);
+      color = mix(color, screened, colorAlpha * 0.92);
+      color += grain * 0.085 * colorAlpha;
+    } else {
+      float blend = clamp(colorAlpha * 1.15, 0.0, 1.0);
+      vec3 toned = mix(gradColor, PLASMA_IDLE_BG, 0.15);
+      color = mix(color, toned, blend * 0.86);
+      color += grain * 0.12 * colorAlpha;
     }
   }
 
