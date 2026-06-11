@@ -67,7 +67,7 @@ GlassBar glassBarAt(vec2 uv) {
 
 vec3 sampleBackground(vec2 uv) {
   if (!uHasBackground) {
-    return vec3(0.02, 0.02, 0.04);
+    return vec3(0.0);
   }
 
   vec2 bgUv = clamp(coverUv(uv, uBackgroundCover), 0.0, 1.0);
@@ -143,30 +143,38 @@ void main() {
   float emit = max(trailSample, liveEmit * liveColumn);
   emit *= barStrength;
 
-  vec3 gradColor = figmaGradient(uv, bar, emit);
+  float colorAlpha = verticalMask * barReveal * emit;
 
+  if (!uHasBackground && colorAlpha < 0.001) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    return;
+  }
+
+  vec3 gradColor = figmaGradient(uv, bar, emit);
   vec3 color = sampleBackground(uv);
 
-  float idleTint = verticalMask * barVar(bar.seedA) * (uHasBackground ? 0.42 : 0.22);
   if (uHasBackground) {
+    float idleTint = verticalMask * 0.42 * barVar(bar.seedA);
     color = mix(color, color * 0.65, idleTint);
-  } else {
-    vec3 idleHint = figmaGradient(uv, bar, 0.12);
-    color = mix(color, idleHint, idleTint);
   }
 
   float grain = filmGrain(uv);
-  color += grain * 0.06;
+  if (uHasBackground) {
+    color += grain * 0.06;
+  }
 
-  float colorAlpha = verticalMask * barReveal * emit;
   if (colorAlpha > 0.001) {
     vec3 screened = 1.0 - (1.0 - color) * (1.0 - gradColor);
     color = mix(color, screened, colorAlpha * 0.92);
-    color += grain * 0.05 * colorAlpha;
+    if (uHasBackground) {
+      color += grain * 0.05 * colorAlpha;
+    }
   }
 
-  float vignette = smoothstep(1.15, 0.3, length((uv - 0.5) * vec2(1.05, 1.0)));
-  color *= mix(0.78, 1.0, vignette);
+  if (uHasBackground) {
+    float vignette = smoothstep(1.15, 0.3, length((uv - 0.5) * vec2(1.05, 1.0)));
+    color *= mix(0.78, 1.0, vignette);
+  }
 
   gl_FragColor = vec4(color, 1.0);
 }
