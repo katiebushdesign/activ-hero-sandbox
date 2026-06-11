@@ -121,7 +121,6 @@ button {
   min-height: calc(100vh - 5rem);
   min-height: calc(100dvh - 5rem);
   padding: 2rem clamp(1.5rem, 5vw, 4rem) 6rem;
-  pointer-events: none;
 }
 
 .hero__headline {
