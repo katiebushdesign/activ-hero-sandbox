@@ -23,9 +23,9 @@ float barVar(float seed) {
 
 float barPulseScale(float barId, float barSeed) {
   float phase = barId * 0.9 + barSeed * 6.28318;
-  float speed = 0.35 + barSeed * 0.45;
+  float speed = 0.1 + barSeed * 0.12;
   float pulse = sin(uTime * speed + phase);
-  return 1.0 + 0.025 + 0.025 * pulse;
+  return 1.0 + 0.01 + 0.01 * pulse;
 }
 
 void main() {

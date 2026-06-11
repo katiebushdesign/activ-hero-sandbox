@@ -1,8 +1,8 @@
 export class PointerTracker {
   constructor(element, options = {}) {
     this.element = element;
-    this.positionSmoothing = options.positionSmoothing ?? 14;
-    this.velocitySmoothing = options.velocitySmoothing ?? 10;
+    this.positionSmoothing = options.positionSmoothing ?? 18;
+    this.velocitySmoothing = options.velocitySmoothing ?? 14;
 
     this.target = { x: 0.5, y: 0.5 };
     this.position = { x: 0.5, y: 0.5 };

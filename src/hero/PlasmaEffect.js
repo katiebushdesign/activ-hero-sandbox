@@ -7,11 +7,11 @@ import { setBackgroundCoverUniforms } from './backgroundUv.js';
 
 export const TUNING = {
   PLASMA_MASK_LEFT: 1.0,
-  TRAIL_DECAY: 0.94,
+  TRAIL_DECAY: 0.965,
   PIXEL_MAX: 48,
   VELOCITY_SENSITIVITY: 1.2,
   STAMP_STRENGTH: 0.7,
-  TRAIL_SCALE: 0.75,
+  TRAIL_SCALE: 0.85,
 };
 
 export class PlasmaEffect {
@@ -31,6 +31,7 @@ export class PlasmaEffect {
       uPixelMax: { value: TUNING.PIXEL_MAX },
       uVelocitySensitivity: { value: TUNING.VELOCITY_SENSITIVITY },
       uUseVideo: { value: false },
+      uHasBackground: { value: true },
       uBackgroundCover: { value: new THREE.Vector4(1, 1, 0, 0) },
       uPointerActive: { value: 0 },
     };
@@ -77,11 +78,30 @@ export class PlasmaEffect {
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
     this.trailTargets = [null, null];
+    this._fallbackTexture = null;
+  }
+
+  _ensureFallbackTexture() {
+    if (this._fallbackTexture) return this._fallbackTexture;
+
+    const data = new Uint8Array([5, 5, 10, 255]);
+    this._fallbackTexture = new THREE.DataTexture(data, 1, 1);
+    this._fallbackTexture.colorSpace = THREE.SRGBColorSpace;
+    this._fallbackTexture.needsUpdate = true;
+    return this._fallbackTexture;
+  }
+
+  setNoBackground() {
+    this.uniforms.uBackground.value = this._ensureFallbackTexture();
+    this.uniforms.uUseVideo.value = false;
+    this.uniforms.uHasBackground.value = false;
+    this.uniforms.uBackgroundCover.value.set(1, 1, 0, 0);
   }
 
   setBackground(texture, { isVideo = false } = {}) {
     this.uniforms.uBackground.value = texture;
     this.uniforms.uUseVideo.value = isVideo;
+    this.uniforms.uHasBackground.value = true;
     if (texture) {
       texture.colorSpace = THREE.SRGBColorSpace;
       this.refreshBackgroundCover(texture);
@@ -105,13 +125,13 @@ export class PlasmaEffect {
           minFilter: THREE.LinearFilter,
           magFilter: THREE.LinearFilter,
           format: THREE.RGBAFormat,
-          type: THREE.HalfFloatType,
+          type: THREE.FloatType,
         }),
         new THREE.WebGLRenderTarget(tw, th, {
           minFilter: THREE.LinearFilter,
           magFilter: THREE.LinearFilter,
           format: THREE.RGBAFormat,
-          type: THREE.HalfFloatType,
+          type: THREE.FloatType,
         }),
       ];
       this.clearTrail();
@@ -196,5 +216,6 @@ export class PlasmaEffect {
     this.quad.geometry.dispose();
     this.trailQuad.geometry.dispose();
     this.trailTargets.forEach((rt) => rt?.dispose());
+    this._fallbackTexture?.dispose();
   }
 }

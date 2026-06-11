@@ -10,6 +10,7 @@ uniform float uPlasmaMaskLeft;
 uniform float uPixelMax;
 uniform float uVelocitySensitivity;
 uniform bool uUseVideo;
+uniform bool uHasBackground;
 uniform vec4 uBackgroundCover; // xy = scale, zw = offset
 uniform float uPointerActive;
 
@@ -65,6 +66,10 @@ GlassBar glassBarAt(vec2 uv) {
 }
 
 vec3 sampleBackground(vec2 uv) {
+  if (!uHasBackground) {
+    return vec3(0.02, 0.02, 0.04);
+  }
+
   vec2 bgUv = clamp(coverUv(uv, uBackgroundCover), 0.0, 1.0);
   vec4 bg = texture2D(uBackground, bgUv);
 
@@ -76,8 +81,10 @@ vec3 sampleBackground(vec2 uv) {
 }
 
 float filmGrain(vec2 uv) {
-  float g1 = hash(uv * uResolution + uTime * 0.5);
-  float g2 = hash(uv * uResolution * 1.7 + uTime * 0.31);
+  vec2 cell = floor(uv * uResolution * 0.45);
+  float t = uTime * 0.06;
+  float g1 = hash(cell + t);
+  float g2 = hash(cell * 1.37 + t * 0.73);
   return (g1 + g2) * 0.5 - 0.5;
 }
 
@@ -87,9 +94,9 @@ float barVar(float seed) {
 
 float barPulseScale(GlassBar bar) {
   float phase = bar.bandId * 0.9 + bar.seedB * 6.28318;
-  float speed = 0.35 + bar.seedC * 0.45;
+  float speed = 0.1 + bar.seedC * 0.12;
   float pulse = sin(uTime * speed + phase);
-  return 1.0 + 0.025 + 0.025 * pulse;
+  return 1.0 + 0.01 + 0.01 * pulse;
 }
 
 vec3 figmaGradient(vec2 uv, GlassBar bar, float emit) {
@@ -97,8 +104,8 @@ vec3 figmaGradient(vec2 uv, GlassBar bar, float emit) {
 
   float paletteT = (1.0 - uv.y) + barYOffset;
 
-  float grain = hash(uv * uResolution + uTime * 0.35);
-  paletteT += (grain - 0.5) * 0.025 * emit;
+  float grain = hash(floor(uv * uResolution * 0.3));
+  paletteT += (grain - 0.5) * 0.016 * emit;
 
   paletteT = clamp(paletteT, 0.0, 1.0);
   return samplePalette(paletteT);
@@ -140,17 +147,22 @@ void main() {
 
   vec3 color = sampleBackground(uv);
 
-  float idleTint = verticalMask * 0.42 * barVar(bar.seedA);
-  color = mix(color, color * 0.65, idleTint);
+  float idleTint = verticalMask * barVar(bar.seedA) * (uHasBackground ? 0.42 : 0.22);
+  if (uHasBackground) {
+    color = mix(color, color * 0.65, idleTint);
+  } else {
+    vec3 idleHint = figmaGradient(uv, bar, 0.12);
+    color = mix(color, idleHint, idleTint);
+  }
 
   float grain = filmGrain(uv);
-  color += grain * 0.11;
+  color += grain * 0.06;
 
   float colorAlpha = verticalMask * barReveal * emit;
   if (colorAlpha > 0.001) {
     vec3 screened = 1.0 - (1.0 - color) * (1.0 - gradColor);
     color = mix(color, screened, colorAlpha * 0.92);
-    color += grain * 0.1 * colorAlpha;
+    color += grain * 0.05 * colorAlpha;
   }
 
   float vignette = smoothstep(1.15, 0.3, length((uv - 0.5) * vec2(1.05, 1.0)));

@@ -4,10 +4,11 @@ import { PlasmaEffect } from './PlasmaEffect.js';
 import { PointerTracker } from './PointerTracker.js';
 
 export class HeroScene {
-  constructor({ canvas, container, videoEl }) {
+  constructor({ canvas, container, videoEl, skipBackground = false }) {
     this.canvas = canvas;
     this.container = container;
-    this.videoEl = videoEl;
+    this.videoEl = skipBackground ? null : videoEl;
+    this.skipBackground = skipBackground;
     this.isVisible = true;
     this.isRunning = false;
     this.rafId = null;
@@ -54,6 +55,12 @@ export class HeroScene {
   }
 
   async _initMedia() {
+    if (this.skipBackground) {
+      this.plasma.setNoBackground();
+      this.start();
+      return;
+    }
+
     const image = await this._loadHeroImage();
     this.backgroundTexture = image;
     this.plasma.setBackground(image, { isVideo: false });
