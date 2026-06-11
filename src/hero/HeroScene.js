@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { assetUrl } from '../assetUrl.js';
 import { PlasmaEffect } from './PlasmaEffect.js';
 import { PointerTracker } from './PointerTracker.js';
 
@@ -79,9 +80,9 @@ export class HeroScene {
 
   async _loadHeroImage() {
     const sources = [
-      '/assets/hero-focused.jpg',
-      '/assets/hero-figma.jpg',
-      '/assets/hero-surgery.jpg',
+      assetUrl('assets/hero-focused.jpg'),
+      assetUrl('assets/hero-figma.jpg'),
+      assetUrl('assets/hero-surgery.jpg'),
     ];
 
     for (const url of sources) {
