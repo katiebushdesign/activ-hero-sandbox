@@ -4,11 +4,12 @@ import { PlasmaEffect } from './PlasmaEffect.js';
 import { PointerTracker } from './PointerTracker.js';
 
 export class HeroScene {
-  constructor({ canvas, container, videoEl, skipBackground = false }) {
+  constructor({ canvas, container, videoEl, skipBackground = false, preferredImage }) {
     this.canvas = canvas;
     this.container = container;
     this.videoEl = skipBackground ? null : videoEl;
     this.skipBackground = skipBackground;
+    this.preferredImage = preferredImage;
     this.isVisible = true;
     this.isRunning = false;
     this.rafId = null;
@@ -86,11 +87,13 @@ export class HeroScene {
   }
 
   async _loadHeroImage() {
-    const sources = [
-      assetUrl('assets/hero-focused.jpg'),
-      assetUrl('assets/hero-figma.jpg'),
-      assetUrl('assets/hero-surgery.jpg'),
-    ];
+    const sources = this.preferredImage
+      ? [assetUrl(this.preferredImage)]
+      : [
+          assetUrl('assets/hero-focused.jpg'),
+          assetUrl('assets/hero-figma.jpg'),
+          assetUrl('assets/hero-surgery.jpg'),
+        ];
 
     for (const url of sources) {
       try {

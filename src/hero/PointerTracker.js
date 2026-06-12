@@ -3,23 +3,36 @@ export class PointerTracker {
     this.element = element;
     this.positionSmoothing = options.positionSmoothing ?? 18;
     this.velocitySmoothing = options.velocitySmoothing ?? 14;
+    // Touch hold is often perfectly still; desktop mice jitter enough to widen the bar spread.
+    this.holdMinVelocity = options.holdMinVelocity ?? 1.8;
 
     this.target = { x: 0.5, y: 0.5 };
     this.position = { x: 0.5, y: 0.5 };
     this.velocity = 0;
     this.smoothedVelocity = 0;
     this.isActive = false;
+    this._pressed = false;
+    this._hovering = false;
 
     this._last = { x: 0.5, y: 0.5 };
     this._lastTime = performance.now();
 
+    this._isCoarsePointer =
+      options.coarsePointer ?? window.matchMedia('(pointer: coarse)').matches;
+
     this._onMove = this._onMove.bind(this);
     this._onEnter = this._onEnter.bind(this);
     this._onLeave = this._onLeave.bind(this);
+    this._onDown = this._onDown.bind(this);
+    this._onUp = this._onUp.bind(this);
 
-    element.addEventListener('pointermove', this._onMove, { passive: true });
-    element.addEventListener('pointerenter', this._onEnter, { passive: true });
-    element.addEventListener('pointerleave', this._onLeave, { passive: true });
+    const listenerOpts = { passive: true, capture: true };
+    element.addEventListener('pointerdown', this._onDown, listenerOpts);
+    element.addEventListener('pointermove', this._onMove, listenerOpts);
+    element.addEventListener('pointerup', this._onUp, listenerOpts);
+    element.addEventListener('pointercancel', this._onUp, listenerOpts);
+    element.addEventListener('pointerenter', this._onEnter, listenerOpts);
+    element.addEventListener('pointerleave', this._onLeave, listenerOpts);
   }
 
   _updateFromEvent(event) {
@@ -41,7 +54,11 @@ export class PointerTracker {
     this._last.x = x;
     this._last.y = y;
     this._lastTime = now;
-    this.isActive = true;
+    this._syncActive();
+  }
+
+  _syncActive() {
+    this.isActive = this._pressed || this._hovering;
   }
 
   update(delta) {
@@ -49,7 +66,11 @@ export class PointerTracker {
     this.position.x += (this.target.x - this.position.x) * positionMix;
     this.position.y += (this.target.y - this.position.y) * positionMix;
 
-    const targetVelocity = this.isActive ? this.velocity : 0;
+    let targetVelocity = this.isActive ? this.velocity : 0;
+    if (this._isCoarsePointer && this._pressed) {
+      targetVelocity = Math.max(targetVelocity, this.holdMinVelocity);
+    }
+
     const velocityMix = 1 - Math.exp(-this.velocitySmoothing * delta);
     this.smoothedVelocity += (targetVelocity - this.smoothedVelocity) * velocityMix;
 
@@ -62,17 +83,37 @@ export class PointerTracker {
     this._updateFromEvent(event);
   }
 
-  _onEnter(event) {
+  _onDown(event) {
+    this._pressed = true;
     this._updateFromEvent(event);
   }
 
+  _onUp() {
+    this._pressed = false;
+    this._syncActive();
+  }
+
+  _onEnter(event) {
+    if (!this._isCoarsePointer) {
+      this._hovering = true;
+      this._updateFromEvent(event);
+    }
+  }
+
   _onLeave() {
-    this.isActive = false;
+    if (!this._isCoarsePointer) {
+      this._hovering = false;
+      this._syncActive();
+    }
   }
 
   dispose() {
-    this.element.removeEventListener('pointermove', this._onMove);
-    this.element.removeEventListener('pointerenter', this._onEnter);
-    this.element.removeEventListener('pointerleave', this._onLeave);
+    const listenerOpts = { capture: true };
+    this.element.removeEventListener('pointerdown', this._onDown, listenerOpts);
+    this.element.removeEventListener('pointermove', this._onMove, listenerOpts);
+    this.element.removeEventListener('pointerup', this._onUp, listenerOpts);
+    this.element.removeEventListener('pointercancel', this._onUp, listenerOpts);
+    this.element.removeEventListener('pointerenter', this._onEnter, listenerOpts);
+    this.element.removeEventListener('pointerleave', this._onLeave, listenerOpts);
   }
 }
