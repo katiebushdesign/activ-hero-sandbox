@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Activ Surgical — Hero (Dark)</title>
+    <title>Activ Surgical — Hero (Image)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,21 +12,9 @@
     />
     <link rel="stylesheet" href="/styles/hero.css" />
   </head>
-  <body class="hero-page--dark">
-    <section class="hero hero--centered" id="hero">
+  <body class="hero-page--image">
+    <section class="hero hero--split" id="hero">
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
-
-      <video
-        id="hero-video"
-        class="hero__video-source"
-        muted
-        loop
-        playsinline
-        preload="auto"
-        poster="/assets/hero-focused.jpg"
-      >
-        <source src="/assets/hero-surgery.mp4" type="video/mp4" />
-      </video>
 
       <header class="hero__header">
         <a href="#" class="hero__logo" aria-label="Activ Surgical home">
@@ -40,7 +28,7 @@
               </linearGradient>
             </defs>
             <circle cx="20" cy="20" r="18.5" stroke="url(#activ-logo-ring)" stroke-width="2" />
-            <path d="M20 11.5 27.25 29.5H23.9L22.35 25.1H17.65L16.1 29.5H12.75L20 11.5Zm-1.55 9.2h3.1L20 16.4l-1.55 4.3Z" fill="currentColor" />
+            <path d="M20 11.5 27.25 29.5H23.9L22.35 25.1H17.65L16.1 29.5H12.75L20 11.5Zm-1.55 9.2h3.1L20 16.4l-1.55 4.3Z" fill="white" />
           </svg>
           <span class="hero__logo-wordmark">
             <span class="hero__logo-activ">ACTIV</span>
@@ -78,37 +66,47 @@
         <a href="#" class="hero__cta hero__cta--header">Book a Demo</a>
       </header>
 
-      <div class="hero__content">
-        <h1 class="hero__headline">Insight beyond the surface.</h1>
-        <p class="hero__subheadline">
-          Real-time surgical intelligence to empower surgeons and platforms in
-          the moments that matter most.
+      <div class="hero__header-rule" aria-hidden="true"></div>
+
+      <div class="hero__main">
+        <div class="hero__intro">
+          <h1 class="hero__headline">See what<br />others can't.</h1>
+          <a href="#" class="hero__cta hero__cta--primary">Book a Demo</a>
+        </div>
+
+        <p class="hero__subheadline hero__subheadline--aside">
+          ActivSight brings real-time perfusion and anatomy into view — so every
+          surgical decision is informed, confident, and clear.
         </p>
       </div>
 
       <footer class="hero__footer">
         <div class="hero__stats">
           <div class="hero__stat">
-            <p class="hero__stat-label">Surgical cases</p>
-            <p class="hero__stat-value">1,000+</p>
+            <p class="hero__stat-label">Hospitals using ActivSight</p>
+            <p class="hero__stat-value">50+</p>
           </div>
           <div class="hero__stat">
-            <p class="hero__stat-label">Only dye-free perfusion technology</p>
-            <p class="hero__stat-value">FDA-cleared</p>
+            <p class="hero__stat-label">Procedures supported worldwide</p>
+            <p class="hero__stat-value">10,000+</p>
           </div>
           <div class="hero__stat">
-            <p class="hero__stat-label">YoY growth</p>
-            <p class="hero__stat-value">122%</p>
+            <p class="hero__stat-label">Average setup time</p>
+            <p class="hero__stat-value">&lt;2 min</p>
           </div>
         </div>
-      </footer>
 
-      <button type="button" class="hero__video-btn" id="hero-video-btn">
-        <span class="hero__video-btn-icon" aria-hidden="true">▶</span>
-        Watch 1:25
-      </button>
+        <button type="button" class="hero__scroll" aria-label="Scroll down">
+          <span class="hero__scroll-ring" aria-hidden="true"></span>
+          <span class="hero__scroll-inner">
+            <svg class="hero__scroll-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <path d="M14 6.5v14M8.5 16l5.5 5.5L19.5 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </button>
+      </footer>
     </section>
 
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main-hero-image.js"></script>
   </body>
 </html>

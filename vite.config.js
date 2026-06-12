@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         plasma: resolve(__dirname, 'plasma-only.html'),
+        image: resolve(__dirname, 'hero-image.html'),
       },
     },
   },
