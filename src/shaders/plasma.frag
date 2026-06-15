@@ -14,6 +14,7 @@ uniform bool uHasBackground;
 uniform vec4 uBackgroundCover; // xy = scale, zw = offset
 uniform float uPointerActive;
 uniform vec3 uIdleBg;
+uniform float uBackgroundGrade;
 
 varying vec2 vUv;
 
@@ -166,22 +167,32 @@ void main() {
 
   float colorAlpha = verticalMask * barReveal * emit;
 
+  vec3 gradColor = figmaGradient(uv, bar, emit);
+
+  // Overlay: HTML image/video below canvas — plasma only, full-brightness media underneath.
+  if (uBackgroundGrade < 0.001) {
+    if (colorAlpha < 0.001) {
+      discard;
+    }
+    gl_FragColor = vec4(gradColor, clamp(colorAlpha * 0.92, 0.0, 1.0));
+    return;
+  }
+
   if (!uHasBackground && colorAlpha < 0.001) {
     gl_FragColor = vec4(uIdleBg, 1.0);
     return;
   }
 
-  vec3 gradColor = figmaGradient(uv, bar, emit);
   vec3 color = sampleBackground(uv);
 
-  if (uHasBackground) {
+  if (uHasBackground && uBackgroundGrade > 0.001) {
     float idleTint = verticalMask * 0.42 * barVar(bar.seedA);
-    color = mix(color, color * 0.65, idleTint);
+    color = mix(color, color * 0.65, idleTint * uBackgroundGrade);
   }
 
   float grain = filmGrain(uv);
 
-  if (uHasBackground) {
+  if (uHasBackground && uBackgroundGrade > 0.001) {
     color += grain * 0.075;
   }
 
@@ -189,7 +200,9 @@ void main() {
     if (uHasBackground) {
       vec3 screened = 1.0 - (1.0 - color) * (1.0 - gradColor);
       color = mix(color, screened, colorAlpha * 0.92);
-      color += grain * 0.085 * colorAlpha;
+      if (uBackgroundGrade > 0.001) {
+        color += grain * 0.085 * colorAlpha;
+      }
     } else {
       float blend = clamp(colorAlpha * 1.15, 0.0, 1.0);
       vec3 toned = mix(gradColor, uIdleBg, 0.15);
@@ -198,9 +211,9 @@ void main() {
     }
   }
 
-  if (uHasBackground) {
+  if (uHasBackground && uBackgroundGrade > 0.001) {
     float vignette = smoothstep(1.15, 0.3, length((uv - 0.5) * vec2(1.05, 1.0)));
-    color *= mix(0.78, 1.0, vignette);
+    color *= mix(0.78, 1.0, mix(1.0, vignette, uBackgroundGrade));
   }
 
   gl_FragColor = vec4(color, 1.0);

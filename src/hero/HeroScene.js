@@ -4,12 +4,17 @@ import { PlasmaEffect } from './PlasmaEffect.js';
 import { PointerTracker } from './PointerTracker.js';
 
 export class HeroScene {
-  constructor({ canvas, container, videoEl, skipBackground = false, preferredImage, plasmaIdleBg }) {
+  constructor({ canvas, container, videoEl, skipBackground = false, preferredImage, plasmaIdleBg, backgroundFlipX = false, preserveBackground = false, onMediaModeChange, onMediaReady, onMediaFailed, pointerElement }) {
     this.canvas = canvas;
     this.container = container;
     this.videoEl = skipBackground ? null : videoEl;
     this.skipBackground = skipBackground;
     this.plasmaIdleBg = plasmaIdleBg;
+    this.backgroundFlipX = backgroundFlipX;
+    this.preserveBackground = preserveBackground;
+    this.onMediaModeChange = onMediaModeChange;
+    this.onMediaReady = onMediaReady;
+    this.onMediaFailed = onMediaFailed;
     this.preferredImage = preferredImage;
     this.isVisible = true;
     this.isRunning = false;
@@ -19,18 +24,24 @@ export class HeroScene {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
-      alpha: false,
+      alpha: preserveBackground,
+      premultipliedAlpha: !preserveBackground,
       powerPreference: 'high-performance',
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    if (preserveBackground) {
+      this.renderer.setClearColor(0x000000, 0);
+    }
 
     this.plasma = new PlasmaEffect(this.renderer);
-    this.pointer = new PointerTracker(container);
+    this.plasma.setBackgroundGrading(this.preserveBackground ? 0 : 1);
+    this.pointer = new PointerTracker(pointerElement ?? container);
 
     this.backgroundTexture = null;
     this.videoTexture = null;
     this.mediaMode = 'image';
     this._videoCoverReady = false;
+    this._mediaReady = false;
 
     this._onResize = this._onResize.bind(this);
     window.addEventListener('resize', this._onResize);
@@ -42,7 +53,7 @@ export class HeroScene {
     this._observer = new IntersectionObserver(
       (entries) => {
         this.isVisible = entries[0]?.isIntersecting ?? true;
-        if (this.isVisible) {
+        if (this.isVisible && this._mediaReady) {
           this.start();
         } else {
           this.stop();
@@ -53,23 +64,36 @@ export class HeroScene {
     this._observer.observe(container);
 
     this._onResize();
-    this._initMedia();
+    this._initMedia().catch((error) => {
+      console.error('[HeroScene] Media init failed:', error);
+      this.onMediaFailed?.(error);
+    });
   }
 
   async _initMedia() {
+    if (this.preserveBackground) {
+      this.plasma.setNoBackground();
+      this._mediaReady = true;
+      this.onMediaReady?.();
+      if (this.isVisible) this.start();
+      return;
+    }
+
     if (this.skipBackground) {
       this.plasma.setNoBackground(
         this.plasmaIdleBg ? { idleBg: this.plasmaIdleBg } : undefined
       );
-      this.start();
+      this._mediaReady = true;
+      this.onMediaReady?.();
+      if (this.isVisible) this.start();
       return;
     }
 
     const image = await this._loadHeroImage();
     this.backgroundTexture = image;
-    this.plasma.setBackground(image, { isVideo: false });
+    this.plasma.setBackground(image, { isVideo: false, flipX: this.backgroundFlipX });
 
-    if (this.videoEl) {
+    if (this.videoEl && !this.preserveBackground) {
       this._bindVideoCoverEvents();
       this.videoTexture = new THREE.VideoTexture(this.videoEl);
       this.videoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -81,22 +105,20 @@ export class HeroScene {
       const canPlay = await this._tryPlayVideo();
       if (canPlay) {
         this.mediaMode = 'video';
-        this.plasma.setBackground(this.videoTexture, { isVideo: true });
+        this.plasma.setBackground(this.videoTexture, { isVideo: true, flipX: this.backgroundFlipX });
         this._refreshActiveMediaCover();
       }
     }
 
-    this.start();
+    this._mediaReady = true;
+    this.onMediaReady?.();
+    if (this.isVisible) this.start();
   }
 
   async _loadHeroImage() {
     const sources = this.preferredImage
       ? [assetUrl(this.preferredImage)]
-      : [
-          assetUrl('assets/hero-focused.jpg'),
-          assetUrl('assets/hero-figma.jpg'),
-          assetUrl('assets/hero-surgery.jpg'),
-        ];
+      : [assetUrl('assets/hero-focused.jpg')];
 
     for (const url of sources) {
       try {
@@ -177,20 +199,37 @@ export class HeroScene {
   }
 
   useImageBackground() {
+    if (this.preserveBackground) {
+      this.mediaMode = 'image';
+      this.videoEl?.pause();
+      this.onMediaModeChange?.('image');
+      return;
+    }
+
     if (this.backgroundTexture) {
       this.mediaMode = 'image';
       this._videoCoverReady = false;
-      this.plasma.setBackground(this.backgroundTexture, { isVideo: false });
+      this.plasma.setBackground(this.backgroundTexture, { isVideo: false, flipX: this.backgroundFlipX });
       this._refreshActiveMediaCover();
     }
   }
 
   async useVideoBackground() {
+    if (this.preserveBackground) {
+      if (!this.videoEl) return false;
+      const ok = await this._tryPlayVideo();
+      if (ok) {
+        this.mediaMode = 'video';
+        this.onMediaModeChange?.('video');
+      }
+      return ok;
+    }
+
     if (!this.videoEl || !this.videoTexture) return false;
     const ok = await this._tryPlayVideo();
     if (ok) {
       this.mediaMode = 'video';
-      this.plasma.setBackground(this.videoTexture, { isVideo: true });
+      this.plasma.setBackground(this.videoTexture, { isVideo: true, flipX: this.backgroundFlipX });
       this._refreshActiveMediaCover();
     }
     return ok;

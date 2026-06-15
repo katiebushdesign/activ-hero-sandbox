@@ -14,7 +14,6 @@ import { fileURLToPath } from 'node:url';
 
 const FILE_KEY = 'aKVxgavTNV0x4lauDGG1Ub';
 const ASSETS = [
-  { nodeId: '370:694', format: 'jpg', scale: 2, outFile: 'hero-figma.jpg' },
   { nodeId: '448:1319', format: 'svg', outFile: 'activ-logo.svg' },
   { nodeId: '448:1374', format: 'svg', outFile: 'scroll-arrow.svg' },
 ];

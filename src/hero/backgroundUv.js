@@ -14,7 +14,13 @@ export function getMediaDimensions(texture) {
   return { width, height };
 }
 
-export function setBackgroundCoverUniforms(uniforms, texture, viewportWidth, viewportHeight) {
+export function setBackgroundCoverUniforms(
+  uniforms,
+  texture,
+  viewportWidth,
+  viewportHeight,
+  { flipX = false } = {}
+) {
   if (!texture || viewportWidth <= 0 || viewportHeight <= 0) {
     uniforms.uBackgroundCover.value.set(1, 1, 0, 0);
     return false;
@@ -37,6 +43,10 @@ export function setBackgroundCoverUniforms(uniforms, texture, viewportWidth, vie
     scaleY = textureAspect / viewportAspect;
   } else {
     scaleX = viewportAspect / textureAspect;
+  }
+
+  if (flipX) {
+    scaleX = -scaleX;
   }
 
   uniforms.uBackgroundCover.value.set(scaleX, scaleY, 0, 0);

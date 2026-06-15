@@ -3,112 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Activ Surgical — Hero (Dark)</title>
+    <title>Activ Surgical — Hero Sandbox</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/hero.css" />
   </head>
-  <body class="hero-page--dark">
-    <section class="hero hero--centered" id="hero">
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <body class="hero-page--index">
+    <main class="hero-index">
+      <a href="./" class="hero-index__logo" aria-label="Activ Surgical home">
+        <img
+          class="hero-index__logo-img"
+          src="assets/activ-logo.svg"
+          width="136"
+          height="40"
+          alt=""
+        />
+      </a>
 
-      <video
-        id="hero-video"
-        class="hero__video-source"
-        muted
-        loop
-        playsinline
-        preload="auto"
-        poster="/assets/hero-focused.jpg"
-      >
-        <source src="/assets/hero-surgery.mp4" type="video/mp4" />
-      </video>
-
-      <header class="hero__header">
-        <a href="#" class="hero__logo" aria-label="Activ Surgical home">
-          <svg class="hero__logo-symbol" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="activ-logo-ring" x1="20" y1="0" x2="20" y2="40" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#FCFFA4" />
-                <stop offset="0.35" stop-color="#F15A24" />
-                <stop offset="0.7" stop-color="#8E2464" />
-                <stop offset="1" stop-color="#410066" />
-              </linearGradient>
-            </defs>
-            <circle cx="20" cy="20" r="18.5" stroke="url(#activ-logo-ring)" stroke-width="2" />
-            <path d="M20 11.5 27.25 29.5H23.9L22.35 25.1H17.65L16.1 29.5H12.75L20 11.5Zm-1.55 9.2h3.1L20 16.4l-1.55 4.3Z" fill="currentColor" />
-          </svg>
-          <span class="hero__logo-wordmark">
-            <span class="hero__logo-activ">ACTIV</span>
-            <span class="hero__logo-surgical">SURGICAL</span>
-          </span>
-        </a>
-
-        <nav class="hero__nav" aria-label="Primary">
-          <a href="#" class="hero__nav-link">
-            Technology
-            <svg class="hero__nav-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6.5 8 10.5 12 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-          <a href="#" class="hero__nav-link">
-            Solutions
-            <svg class="hero__nav-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6.5 8 10.5 12 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-          <a href="#" class="hero__nav-link">
-            Company
-            <svg class="hero__nav-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6.5 8 10.5 12 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-          <a href="#" class="hero__nav-link">
-            Resources
-            <svg class="hero__nav-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M4 6.5 8 10.5 12 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-        </nav>
-
-        <a href="#" class="hero__cta hero__cta--header">Book a Demo</a>
-      </header>
-
-      <div class="hero__content">
-        <h1 class="hero__headline">Insight beyond the surface.</h1>
-        <p class="hero__subheadline">
-          Real-time surgical intelligence to empower surgeons and platforms in
-          the moments that matter most.
-        </p>
+      <div class="hero-index__intro">
+        <h1 class="hero-index__title">Hero sandbox</h1>
+        <p class="hero-index__lead">Interactive plasma hero prototypes for the Activ Surgical website.</p>
       </div>
 
-      <footer class="hero__footer">
-        <div class="hero__stats">
-          <div class="hero__stat">
-            <p class="hero__stat-label">Surgical cases</p>
-            <p class="hero__stat-value">1,000+</p>
-          </div>
-          <div class="hero__stat">
-            <p class="hero__stat-label">Only dye-free perfusion technology</p>
-            <p class="hero__stat-value">FDA-cleared</p>
-          </div>
-          <div class="hero__stat">
-            <p class="hero__stat-label">YoY growth</p>
-            <p class="hero__stat-value">122%</p>
-          </div>
-        </div>
-      </footer>
+      <nav class="hero-index__nav" aria-label="Hero variants">
+        <a class="hero-index__card" href="hero-image.html">
+          <span class="hero-index__card-label">Main</span>
+          <span class="hero-index__card-title">Image hero</span>
+          <span class="hero-index__card-desc">Surgery photo, glass nav, video toggle, plasma overlay.</span>
+        </a>
 
-      <button type="button" class="hero__video-btn" id="hero-video-btn">
-        <span class="hero__video-btn-icon" aria-hidden="true">▶</span>
-        Watch 1:25
-      </button>
-    </section>
+        <a class="hero-index__card" href="plasma-only.html">
+          <span class="hero-index__card-label">Light</span>
+          <span class="hero-index__card-title">Light Background</span>
+          <span class="hero-index__card-desc">Warm grey background, split layout, stats row.</span>
+        </a>
 
-    <script type="module" src="/src/main.js"></script>
+        <a class="hero-index__card" href="plasma-dark.html">
+          <span class="hero-index__card-label">Dark</span>
+          <span class="hero-index__card-title">Dark Background</span>
+          <span class="hero-index__card-desc">Black background, centered copy, scroll button.</span>
+        </a>
+      </nav>
+    </main>
   </body>
 </html>

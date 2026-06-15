@@ -31,10 +31,11 @@ export class PlasmaEffect {
       uPixelMax: { value: TUNING.PIXEL_MAX },
       uVelocitySensitivity: { value: TUNING.VELOCITY_SENSITIVITY },
       uUseVideo: { value: false },
-      uHasBackground: { value: true },
+      uHasBackground: { value: false },
       uBackgroundCover: { value: new THREE.Vector4(1, 1, 0, 0) },
       uPointerActive: { value: 0 },
       uIdleBg: { value: new THREE.Vector3(0.898039, 0.898039, 0.905882) },
+      uBackgroundGrade: { value: 1 },
     };
 
     this._viewportWidth = 1;
@@ -80,6 +81,7 @@ export class PlasmaEffect {
 
     this.trailTargets = [null, null];
     this._fallbackTexture = null;
+    this._backgroundFlipX = false;
   }
 
   _ensureFallbackTexture() {
@@ -100,6 +102,13 @@ export class PlasmaEffect {
     this.uniforms.uIdleBg.value.set(r, g, b);
   }
 
+  setBackgroundGrading(amount = 1) {
+    this.uniforms.uBackgroundGrade.value = amount;
+    const overlay = amount < 0.001;
+    this.plasmaMaterial.transparent = overlay;
+    this.plasmaMaterial.depthWrite = !overlay;
+  }
+
   setNoBackground({ idleBg = '#e5e5e7' } = {}) {
     this.uniforms.uBackground.value = this._ensureFallbackTexture();
     this.uniforms.uUseVideo.value = false;
@@ -109,7 +118,8 @@ export class PlasmaEffect {
     this._setIdleBg(idleBg);
   }
 
-  setBackground(texture, { isVideo = false } = {}) {
+  setBackground(texture, { isVideo = false, flipX = false } = {}) {
+    this._backgroundFlipX = flipX;
     this.uniforms.uBackground.value = texture;
     this.uniforms.uUseVideo.value = isVideo;
     this.uniforms.uHasBackground.value = true;
@@ -155,7 +165,8 @@ export class PlasmaEffect {
       this.uniforms,
       texture,
       this._viewportWidth,
-      this._viewportHeight
+      this._viewportHeight,
+      { flipX: this._backgroundFlipX }
     );
   }
 

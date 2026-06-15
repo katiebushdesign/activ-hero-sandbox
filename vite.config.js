@@ -16,6 +16,6 @@ export default defineConfig({
     },
   },
   server: {
-    open: true,
+    open: '/activ-hero-sandbox/',
   },
 });
