@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/styles/hero.css" />
   </head>
   <body class="hero-page--plasma-dark">
-    <section class="hero hero--plasma-dark" id="hero">
+    <section class="hero hero--split" id="hero">
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
       <header class="hero__header">
@@ -62,18 +62,37 @@
       <div class="hero__header-rule" aria-hidden="true"></div>
 
       <div class="hero__main">
-        <div class="hero__content-center">
+        <div class="hero__intro">
           <h1 class="hero__headline">
             <span class="hero__headline-line">Insight</span>
             <span class="hero__headline-line">beyond the</span>
             <span class="hero__headline-line">surface.</span>
           </h1>
-          <p class="hero__subheadline">
-            Real-time surgical intelligence to empower surgeons and platforms in
-            the moments that matter most.
-          </p>
+          <a href="#" class="hero__cta hero__cta--primary">Book a Demo</a>
         </div>
+
+        <p class="hero__subheadline hero__subheadline--aside">
+          Real-time surgical intelligence to empower surgeons and platforms in
+          the moments that matter most.
+        </p>
       </div>
+
+      <footer class="hero__footer">
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <p class="hero__stat-label">Surgical cases</p>
+            <p class="hero__stat-value">1,000+</p>
+          </div>
+          <div class="hero__stat">
+            <p class="hero__stat-label">Only dye-free perfusion technology</p>
+            <p class="hero__stat-value">FDA-cleared</p>
+          </div>
+          <div class="hero__stat">
+            <p class="hero__stat-label">YoY growth</p>
+            <p class="hero__stat-value">122%</p>
+          </div>
+        </div>
+      </footer>
 
       <button type="button" class="hero__scroll" aria-label="Scroll down">
         <img
