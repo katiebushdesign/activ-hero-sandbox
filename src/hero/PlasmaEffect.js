@@ -34,6 +34,7 @@ export class PlasmaEffect {
       uHasBackground: { value: true },
       uBackgroundCover: { value: new THREE.Vector4(1, 1, 0, 0) },
       uPointerActive: { value: 0 },
+      uIdleBg: { value: new THREE.Vector3(0.898039, 0.898039, 0.905882) },
     };
 
     this._viewportWidth = 1;
@@ -91,12 +92,21 @@ export class PlasmaEffect {
     return this._fallbackTexture;
   }
 
-  setNoBackground() {
+  _setIdleBg(hex = '#e5e5e7') {
+    const normalized = hex.replace('#', '');
+    const r = parseInt(normalized.slice(0, 2), 16) / 255;
+    const g = parseInt(normalized.slice(2, 4), 16) / 255;
+    const b = parseInt(normalized.slice(4, 6), 16) / 255;
+    this.uniforms.uIdleBg.value.set(r, g, b);
+  }
+
+  setNoBackground({ idleBg = '#e5e5e7' } = {}) {
     this.uniforms.uBackground.value = this._ensureFallbackTexture();
     this.uniforms.uUseVideo.value = false;
     this.uniforms.uHasBackground.value = false;
     this.uniforms.uBackgroundCover.value.set(1, 1, 0, 0);
     this.trailUniforms.uStampStrength.value = TUNING.STAMP_STRENGTH * 1.26;
+    this._setIdleBg(idleBg);
   }
 
   setBackground(texture, { isVideo = false } = {}) {

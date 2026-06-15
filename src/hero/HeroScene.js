@@ -4,11 +4,12 @@ import { PlasmaEffect } from './PlasmaEffect.js';
 import { PointerTracker } from './PointerTracker.js';
 
 export class HeroScene {
-  constructor({ canvas, container, videoEl, skipBackground = false, preferredImage }) {
+  constructor({ canvas, container, videoEl, skipBackground = false, preferredImage, plasmaIdleBg }) {
     this.canvas = canvas;
     this.container = container;
     this.videoEl = skipBackground ? null : videoEl;
     this.skipBackground = skipBackground;
+    this.plasmaIdleBg = plasmaIdleBg;
     this.preferredImage = preferredImage;
     this.isVisible = true;
     this.isRunning = false;
@@ -57,7 +58,9 @@ export class HeroScene {
 
   async _initMedia() {
     if (this.skipBackground) {
-      this.plasma.setNoBackground();
+      this.plasma.setNoBackground(
+        this.plasmaIdleBg ? { idleBg: this.plasmaIdleBg } : undefined
+      );
       this.start();
       return;
     }
