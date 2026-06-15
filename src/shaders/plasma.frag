@@ -13,6 +13,7 @@ uniform bool uUseVideo;
 uniform bool uHasBackground;
 uniform vec4 uBackgroundCover; // xy = scale, zw = offset
 uniform float uPointerActive;
+uniform vec3 uIdleBg;
 
 varying vec2 vUv;
 
@@ -33,7 +34,6 @@ const vec3 PALETTE[PALETTE_SIZE] = vec3[](
 );
 
 const float BAND_COUNT = 24.0;
-const vec3 PLASMA_IDLE_BG = vec3(0.898039, 0.898039, 0.905882); // warm grey #E5E5E7
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -68,7 +68,7 @@ GlassBar glassBarAt(vec2 uv) {
 
 vec3 sampleBackground(vec2 uv) {
   if (!uHasBackground) {
-    return PLASMA_IDLE_BG;
+    return uIdleBg;
   }
 
   vec2 bgUv = clamp(coverUv(uv, uBackgroundCover), 0.0, 1.0);
@@ -167,7 +167,7 @@ void main() {
   float colorAlpha = verticalMask * barReveal * emit;
 
   if (!uHasBackground && colorAlpha < 0.001) {
-    gl_FragColor = vec4(PLASMA_IDLE_BG, 1.0);
+    gl_FragColor = vec4(uIdleBg, 1.0);
     return;
   }
 
@@ -192,7 +192,7 @@ void main() {
       color += grain * 0.085 * colorAlpha;
     } else {
       float blend = clamp(colorAlpha * 1.15, 0.0, 1.0);
-      vec3 toned = mix(gradColor, PLASMA_IDLE_BG, 0.15);
+      vec3 toned = mix(gradColor, uIdleBg, 0.15);
       color = mix(color, toned, blend * 0.86);
       color += grain * 0.12 * colorAlpha;
     }

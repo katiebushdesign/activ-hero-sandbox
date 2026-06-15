@@ -11,6 +11,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         plasma: resolve(__dirname, 'plasma-only.html'),
         image: resolve(__dirname, 'hero-image.html'),
+        plasmaDark: resolve(__dirname, 'plasma-dark.html'),
       },
     },
   },
