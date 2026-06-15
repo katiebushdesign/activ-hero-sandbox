@@ -174,7 +174,9 @@ void main() {
     if (colorAlpha < 0.001) {
       discard;
     }
-    gl_FragColor = vec4(gradColor, clamp(colorAlpha * 0.92, 0.0, 1.0));
+    float grain = filmGrain(uv);
+    vec3 color = gradColor + grain * 0.12 * colorAlpha;
+    gl_FragColor = vec4(color, clamp(colorAlpha * 0.92, 0.0, 1.0));
     return;
   }
 
