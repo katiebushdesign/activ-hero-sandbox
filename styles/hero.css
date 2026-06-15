@@ -527,9 +527,9 @@ button {
   background: #e5e5e7;
   color: #1a1a1a;
   font-family: 'Albert Sans', 'Inter', system-ui, -apple-system, sans-serif;
-  --hero-glass-bg: rgba(229, 229, 231, 0.62);
-  --hero-glass-border: rgba(255, 255, 255, 0.42);
-  --hero-glass-highlight: rgba(255, 255, 255, 0.28);
+  --hero-glass-bg: rgba(210, 205, 200, 0.72);
+  --hero-glass-border: rgba(255, 252, 248, 0.38);
+  --hero-glass-highlight: rgba(255, 250, 245, 0.24);
 }
 
 .hero-page--light .hero--split {
@@ -620,16 +620,18 @@ button {
   grid-row: 1;
   justify-self: start;
   align-self: start;
-  width: 39.875rem;
-  max-width: 100%;
+  width: 45vw;
+  max-width: 45vw;
+  container-type: inline-size;
   gap: 1.875rem;
 }
 
 .hero-page--light .hero__headline {
-  font-size: 6.875rem;
+  font-size: clamp(2rem, 7.64vw, 9rem);
+  font-size: clamp(2rem, 17cqi, 9rem);
   font-weight: 500;
   line-height: 0.9;
-  letter-spacing: -0.0625rem;
+  letter-spacing: -0.01em;
 }
 
 .hero-page--light .hero__headline-line {
@@ -727,18 +729,12 @@ button {
   height: 100%;
 }
 
-@media (max-width: 1200px) {
-  .hero-page--light .hero__headline {
-    font-size: clamp(2.75rem, 7.6vw, 6.875rem);
-  }
-}
-
 @media (max-width: 900px) {
   .hero-page--light .hero__intro,
   .hero-page--light .hero__subheadline--aside {
     position: static;
-    width: auto;
-    max-width: none;
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero-page--light .hero__main {
