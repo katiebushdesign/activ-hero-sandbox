@@ -54,11 +54,17 @@ export class PointerTracker {
     this._last.x = x;
     this._last.y = y;
     this._lastTime = now;
-    this._syncActive();
+    if (!this._isCoarsePointer) {
+      this._hovering = true;
+    }
+    this.isActive = true;
   }
 
-  _syncActive() {
-    this.isActive = this._pressed || this._hovering;
+  _onLeave() {
+    if (!this._isCoarsePointer) {
+      this._hovering = false;
+      this.isActive = false;
+    }
   }
 
   update(delta) {
@@ -90,20 +96,15 @@ export class PointerTracker {
 
   _onUp() {
     this._pressed = false;
-    this._syncActive();
+    if (this._isCoarsePointer || !this._hovering) {
+      this.isActive = false;
+    }
   }
 
   _onEnter(event) {
     if (!this._isCoarsePointer) {
       this._hovering = true;
       this._updateFromEvent(event);
-    }
-  }
-
-  _onLeave() {
-    if (!this._isCoarsePointer) {
-      this._hovering = false;
-      this._syncActive();
     }
   }
 
